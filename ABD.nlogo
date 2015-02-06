@@ -1,6 +1,87 @@
-extensions [ csv ]
+extensions [ csv table ]
 
-globals [ held? data plot-pen-count ]
+globals [
+  data
+  min-x
+  min-y
+  max-x
+  max-y
+]
+
+turtles-own [
+  keys
+  my-data
+  target-x
+  target-y
+]
+
+to setup
+  ca
+  set-default-shape turtles "circle"
+end
+
+to go
+  if any? turtles [
+    set min-x min [ target-x ] of turtles
+    set min-y min [ target-y ] of turtles
+    set max-x max [ target-x ] of turtles
+    set max-y max [ target-y ] of turtles
+    if max-x = min-x [ set max-x min-x + 1 ]
+    if max-y = min-y [ set max-y min-y + 1 ]
+    ask turtles [
+      let target-view-x x-to-xcor target-x
+      let target-view-y y-to-ycor target-y
+      facexy target-view-x target-view-y
+      let dist distancexy target-view-x target-view-y
+      fd dist / 10
+    ]
+  ]
+  display
+end
+
+to-report x-to-xcor [ x ]
+  report (x - min-x) / (max-x - min-x) * (max-pxcor - min-pxcor) + min-pxcor
+end
+
+to-report y-to-ycor [ y ]
+  report (y - min-y) / (max-y - min-y) * (max-pycor - min-pycor) + min-pycor
+end
+
+;;;
+;; Turtle primitives
+;;;
+
+to-report get [ key ]
+  report item position key keys my-data
+end
+
+to set-x [ new-x ]
+  set target-x new-x
+end
+
+to set-y [ new-y ]
+  set target-y new-y
+end
+
+to set-xy [ new-x new-y ]
+  set-x new-x
+  set-y new-y
+end
+
+;;;
+;; Data primitives
+;;;
+
+to create-turtles-from-data [ table command ]
+  let column-names first table
+  foreach but-first table [
+    crt 1 [
+      set my-data ?
+      set keys column-names
+      run command
+    ]
+  ]
+end
 
 to pprint [ table ]
   foreach table [
@@ -20,6 +101,22 @@ end
 to-report sorted-on [ column table ]
   let index position column first table
   report fput first table sort-by [(item index ?1) < (item index ?2)] but-first table
+end
+
+to-report group-by [ columns table ]
+  let indices map [ position ? first table ] columns
+  let groups table:make
+  foreach but-first table [
+    let row ?
+    let key map [ item ? row ] indices
+    ifelse (table:has-key? groups key) [
+      let group table:get groups key
+      table:put groups key (map lput row group)
+    ] [
+      table:put groups key map [(list ?)] row
+    ]
+  ]
+  report fput first table (map [ table:get groups ? ] table:keys groups)
 end
 
 to-report items [ indices lst ]
@@ -47,113 +144,70 @@ to-report get-col [key table]
   report map first butfirst select (list key ) table
 end
 
-to hold
-  set held? true
-end
-
-to unhold
-  set held? false
-end
-
-to try-clear
-  ifelse held? != true [
-    clear-all-plots
-  ] [
-    create-temporary-plot-pen (word plot-pen-count)
-    set-current-plot-pen (word plot-pen-count)
-    set plot-pen-count plot-pen-count + 1
-  ]
-end
-
-to line [ xy ]
-  chart 0 xy
-end
-
-to bar [ xy ]
-  chart 1 xy
-end
-
-to scatter [ xy ]
-  chart 2 xy
-end
-
-to chart [ mode xy ]
-  try-clear
-  set-plot-pen-mode mode
-  ifelse length xy = 2 [
-    if is-reporter-task? last xy [
-      set xy (list first xy map [(runresult last xy ?)] first xy)
-    ]
-    (foreach first xy last xy [
-      if is-number? ?1 and is-number? ?2 [
-        plotxy ?1 ?2
-      ]
-    ])
-  ] [
-    ifelse is-list? first xy [
-      foreach xy [
-        if is-number? first ? and is-number? last ? [ 
-          plotxy first ? last ?
-        ]
-      ]
-    ] [
-      foreach enumerate xy [
-        if is-number? first ? and is-number? last ? [ 
-          plotxy first ? last ?
-        ]
-      ]
-    ]
-  ]
-end
-
 to-report enumerate [ lst ]
   report (map list (n-values length lst [?]) lst)
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-961
-429
-1206
-633
+0
+45
+698
+764
 16
 16
-5.242424242424242
+20.85
 1
 10
 1
 1
 1
 0
-1
-1
+0
+0
 1
 -16
 16
 -16
 16
-0
-0
+1
+1
 1
 ticks
 30.0
 
-PLOT
-6
+BUTTON
+65
 10
-735
-673
-plot 1
+128
+43
+NIL
+go
+T
+1
+T
+OBSERVER
 NIL
 NIL
-0.0
-1.0
-0.0
-1.0
-true
-false
-"" ""
-PENS
-"pen-0" 1.0 0 -16777216 true "" ""
+NIL
+NIL
+1
+
+BUTTON
+0
+10
+62
+43
+NIL
+setup
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -516,5 +570,5 @@ Line -7500403 true 150 150 90 180
 Line -7500403 true 150 150 210 180
 
 @#$#@#$#@
-0
+1
 @#$#@#$#@
