@@ -96,8 +96,19 @@ to create-turtles-from-data [ table command ]
 end
 
 to pprint [ table ]
+  let widths map [max map [length (word ?)] ?] transpose table
   foreach table [
-    print reduce [(word ?1 "\t" ?2)] ?
+    print reduce [(word ?1 "  " ?2)] (map pad ? widths)
+  ]
+end
+
+to-report pad [val n]
+  let str (word val)
+  let diff n - length str
+  ifelse diff > 0 [
+    report (word str reduce word (n-values diff [" "]))
+  ] [
+    report str
   ]
 end
 
@@ -143,6 +154,10 @@ to-report items [ indices lst ]
   report map [ item ? lst ] indices
 end
 
+to-report transpose [ table ]
+  report n-values (length first table) [ get-col ? table ]
+end
+
 to-report drop [ n lst ]
   report sublist lst n length lst
 end
@@ -161,7 +176,8 @@ to-report drop-meta [ table ]
 end
 
 to-report get-col [key table]
-  report map first butfirst select (list key ) table
+  let index ifelse-value (is-number? key) [ key ] [ position key first table ]
+  report map [ item index ? ] table
 end
 
 to set-col [ key col table ]
