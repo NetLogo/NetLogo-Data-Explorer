@@ -106,6 +106,18 @@ to-report select [ columns table ]
   report map [ items indices ? ] table
 end
 
+to-report query [ pred columns table ]
+  let cols first table
+  let indices map [ position ? cols ] columns
+  let listified-pred listify-task pred (length indices)
+  report (fput first table filter [(runresult listified-pred items indices ?)] but-first table)
+end
+
+to-report listify-task [ tsk num-args ]
+  let args (reduce word n-values num-args [ (word " (item " ? " ?)") ])
+  report runresult (word "task [ (runresult tsk " args ") ]")
+end
+
 to-report sorted-on [ column table ]
   let index position column first table
   report fput first table sort-by [(item index ?1) < (item index ?2)] but-first table
@@ -164,11 +176,11 @@ end
 GRAPHICS-WINDOW
 0
 45
-698
-764
+670
+736
 16
 16
-20.85
+20.0
 1
 10
 1
