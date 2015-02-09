@@ -11,8 +11,8 @@ globals [
 turtles-own [
   keys
   my-data
-  target-x
-  target-y
+  xc
+  yc
 ]
 
 to setup
@@ -22,15 +22,15 @@ end
 
 to go
   if any? turtles [
-    set min-x min [ target-x ] of turtles
-    set min-y min [ target-y ] of turtles
-    set max-x max [ target-x ] of turtles
-    set max-y max [ target-y ] of turtles
+    set min-x min [ xc ] of turtles
+    set min-y min [ yc ] of turtles
+    set max-x max [ xc ] of turtles
+    set max-y max [ yc ] of turtles
     if max-x = min-x [ set max-x min-x + 1 ]
     if max-y = min-y [ set max-y min-y + 1 ]
     ask turtles [
-      let target-view-x x-to-xcor target-x
-      let target-view-y y-to-ycor target-y
+      let target-view-x x-to-xcor xc
+      let target-view-y y-to-ycor yc
       facexy target-view-x target-view-y
       let dist distancexy target-view-x target-view-y
       fd dist / 5
@@ -47,6 +47,23 @@ to-report y-to-ycor [ y ]
   report (y - min-y) / (max-y - min-y) * (max-pycor - min-pycor) + min-pycor
 end
 
+to-report xcor-to-x [ x-cor ]
+  report (x-cor - min-pxcor) / (max-pxcor - min-pxcor) * (max-x - min-x) + min-x
+end
+
+to-report ycor-to-y [ y-cor ]
+  report (y-cor - min-pycor) / (max-pycor - min-pycor) * (max-y - min-y) + min-y
+end
+
+to-report mouse-x
+  report xcor-to-x mouse-xcor
+end
+
+to-report mouse-y
+  report ycor-to-y mouse-ycor
+end
+
+
 ;;;
 ;; Turtle primitives
 ;;;
@@ -56,11 +73,11 @@ to-report get [ key ]
 end
 
 to set-x [ new-x ]
-  set target-x new-x
+  set xc new-x
 end
 
 to set-y [ new-y ]
-  set target-y new-y
+  set yc new-y
 end
 
 to set-xy [ new-x new-y ]
@@ -191,9 +208,9 @@ end
 @#$#@#$#@
 GRAPHICS-WINDOW
 0
-45
+60
 670
-736
+751
 16
 16
 20.0
@@ -218,9 +235,9 @@ ticks
 
 BUTTON
 65
-10
+15
 128
-43
+48
 NIL
 go
 T
@@ -235,9 +252,9 @@ NIL
 
 BUTTON
 0
-10
+15
 62
-43
+48
 NIL
 setup
 NIL
@@ -249,6 +266,39 @@ NIL
 NIL
 NIL
 1
+
+MONITOR
+135
+10
+202
+55
+NIL
+mouse-x
+3
+1
+11
+
+MONITOR
+210
+10
+277
+55
+NIL
+mouse-y
+3
+1
+11
+
+SWITCH
+285
+15
+432
+48
+quick-inspect?
+quick-inspect?
+0
+1
+-1000
 
 @#$#@#$#@
 ## WHAT IS IT?
