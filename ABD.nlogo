@@ -33,7 +33,7 @@ to go
       let target-view-y y-to-ycor target-y
       facexy target-view-x target-view-y
       let dist distancexy target-view-x target-view-y
-      fd dist / 10
+      fd dist / 5
     ]
   ]
   display
@@ -69,6 +69,17 @@ to set-xy [ new-x new-y ]
 end
 
 ;;;
+;; Util
+;;;
+
+to-report heat [ x ]
+  let h (180 + x * 360) mod 360
+  let s ifelse-value (x > 0.5) [ 100 - 200 * (x - 0.5) ] [ 100 ]
+  let b ifelse-value (x < 0.5) [ 200 * x ] [ 100 ]
+  report hsb h s b
+end
+
+;;;
 ;; Data primitives
 ;;;
 
@@ -76,6 +87,7 @@ to create-turtles-from-data [ table command ]
   let column-names first table
   foreach but-first table [
     crt 1 [
+      set shape "circle"
       set my-data ?
       set keys column-names
       run command
@@ -85,11 +97,7 @@ end
 
 to pprint [ table ]
   foreach table [
-    foreach ? [
-      type ?
-      type "\t"
-    ]
-    type "\n"
+    print reduce [(word ?1 "\t" ?2)] ?
   ]
 end
 
@@ -142,6 +150,11 @@ end
 
 to-report get-col [key table]
   report map first butfirst select (list key ) table
+end
+
+to set-col [ key col table ]
+  let index position key table
+  report fput first table (map [ replace-item index ?1 ?2 ] (but-first table) col)
 end
 
 to-report enumerate [ lst ]
