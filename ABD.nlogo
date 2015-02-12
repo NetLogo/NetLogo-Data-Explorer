@@ -1,4 +1,7 @@
-extensions [ csv table ]
+extensions [ csv table xw ]
+
+__includes [ "notebook.nls" ]
+
 
 globals [
   data
@@ -17,26 +20,58 @@ turtles-own [
 
 to setup
   ca
+  setup-notebook
   set-default-shape turtles "circle"
+  xw:ask "input 0" [
+    xw:set-text "set data csv:from-file user-file\necho-table take 20 data"
+  ]
 end
 
 to go
   if any? turtles [
-    set min-x min [ xc ] of turtles
-    set min-y min [ yc ] of turtles
-    set max-x max [ xc ] of turtles
-    set max-y max [ yc ] of turtles
-    if max-x = min-x [ set max-x min-x + 1 ]
-    if max-y = min-y [ set max-y min-y + 1 ]
+    set-bounds
+    let max-dist 0
     ask turtles [
       let target-view-x x-to-xcor xc
       let target-view-y y-to-ycor yc
       facexy target-view-x target-view-y
       let dist distancexy target-view-x target-view-y
       fd dist / 5
+      if dist > max-dist [ set max-dist dist ]
+    ]
+    ;show max-dist
+    if quick-inspect? [
+      ask other turtles [ set label "" ]
+      if mouse-inside? [
+        ask min-one-of turtles [ distancexy mouse-xcor mouse-ycor ] [
+          set label format-coords xc yc
+        ]
+      ]
     ]
   ]
   display
+end
+
+to set-bounds
+  let xs [ xc ] of turtles
+  let ys [ yc ] of turtles
+  set min-x min xs
+  set min-y min ys
+  set max-x max xs
+  set max-y max ys
+  if max-x = min-x [ set max-x min-x + 1 ]
+  if max-y = min-y [ set max-y min-y + 1 ]
+  ask (patch-set
+    patch min-pxcor min-pycor
+    patch min-pxcor max-pycor
+    patch max-pxcor min-pycor
+  ) [
+    ;set plabel format-coords xcor-to-x pxcor ycor-to-y pycor
+  ]
+end
+  
+to-report format-coords [ x y ]
+  report (word (precision x 3) ", " (precision y 3))
 end
 
 to-report x-to-xcor [ x ]
@@ -62,7 +97,6 @@ end
 to-report mouse-y
   report ycor-to-y mouse-ycor
 end
-
 
 ;;;
 ;; Turtle primitives
@@ -112,10 +146,19 @@ to create-turtles-from-data [ table command ]
   ]
 end
 
-to pprint [ table ]
+to print-table [ table ]
+  format-table table task print
+end
+
+to echo-table [ table ]
+  format-table table task echo
+end
+
+to format-table [ table output-task ]
+  set table (map fput (fput "" n-values (length table - 1) [ (word (1 + ?) ".") ]) table)
   let widths map [max map [length (word ?)] ?] transpose table
   foreach table [
-    print reduce [(word ?1 "  " ?2)] (map pad ? widths)
+    (run output-task reduce [(word ?1 "  " ?2)] (map pad ? (sublist widths 0 (length ?))))
   ]
 end
 
@@ -172,7 +215,7 @@ to-report items [ indices lst ]
 end
 
 to-report transpose [ table ]
-  report n-values (length first table) [ get-col ? table ]
+  report n-values (max map length table) [ get-col ? table ]
 end
 
 to-report drop [ n lst ]
@@ -194,7 +237,7 @@ end
 
 to-report get-col [key table]
   let index ifelse-value (is-number? key) [ key ] [ position key first table ]
-  report map [ item index ? ] table
+  report map [ item index ? ] filter [ length ? > index ]table
 end
 
 to set-col [ key col table ]
@@ -215,7 +258,7 @@ GRAPHICS-WINDOW
 16
 20.0
 1
-10
+14
 1
 1
 1
@@ -229,7 +272,7 @@ GRAPHICS-WINDOW
 16
 1
 1
-1
+0
 ticks
 30.0
 

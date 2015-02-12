@@ -1,0 +1,110 @@
+globals [ cells default-height default-width button-width current-output ]
+
+to setup-notebook
+  xw:clear-all
+  set default-height 100
+  set default-width 500
+  set button-width 50
+  set cells []
+  xw:create-tab "notebook" [ xw:set-title "Notebook" ]
+  append-cell
+end
+
+to append-cell
+  let y-pos ifelse-value (not empty? cells) [
+    [xw:y + xw:height] xw:of last cells
+  ] [
+    0
+  ]
+  let id (length cells) / 2
+  let key (word "input " id)
+  xw:create-code-editor key [
+    xw:set-width default-width
+    xw:set-height default-height
+    xw:set-x button-width
+    xw:set-y y-pos
+  ]
+  let output-key (word "output " id)
+  xw:create-text-area output-key [
+    xw:set-width default-width
+    xw:set-height 0
+    xw:set-x button-width
+    xw:set-y [ xw:y + xw:height ] xw:of key
+  ]
+  xw:create-button (word "run " id) [
+    xw:set-label "Run"
+    xw:set-commands (word "set current-output \"" output-key "\" run-cell \"" id "\"")
+    xw:set-width button-width
+    xw:set-y y-pos
+  ]
+  set cells (sentence cells key output-key)
+end
+
+to run-cell [ id ]
+  let cell (word "input " id)
+  set current-output (word "output " id)
+  xw:ask current-output [
+    xw:set-text ""
+    resize-cell
+  ]
+  run [ xw:text ] xw:of cell
+  if current-output = last cells [
+    append-cell
+  ]
+end
+
+to echo [ val ]
+  xw:ask current-output [
+    ifelse empty? xw:text [
+      xw:set-text (word val)
+    ] [
+      xw:set-text (word xw:text "\n" val)
+    ]
+    resize-cell
+  ]
+end
+
+to resize-cell
+  let approx-height 0
+  if not empty? xw:text[
+    let num-lines (1 + length xw:text - length remove "\n" xw:text)
+    if num-lines > 30 [
+      set num-lines 30
+    ]
+    set approx-height 1.3 * xw:font-size * ( 2 +  num-lines)
+  ]
+  if approx-height != xw:height [
+    xw:set-height approx-height
+    redo-layout
+  ]
+end
+
+to-report cell-for-button [ button ]
+  let id substring button (1 + position " " button) (length button)
+  report (word "input " id)
+end
+
+to-report cell-id
+  report substring xw:key (1 + position " " xw:key) length xw:key
+end
+
+to redo-layout
+  (foreach but-first cells but-last cells [
+    let previous ?2
+    let current ?1
+    xw:ask current [
+      xw:set-y [ xw:y + xw:height ] xw:of previous
+      if member? "input" xw:key [
+        xw:ask (word "run " cell-id) [
+          xw:set-y [ xw:y ] xw:of current
+        ]
+      ]
+    ]
+  ])
+end
+
+to remove-cell [ cell ]
+  set cells remove cell cells
+  xw:remove cell
+  redo-layout
+end
