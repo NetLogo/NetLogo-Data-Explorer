@@ -17,12 +17,13 @@ Getting started
 5. If you chose a BehaviorSpace file, the first 6 lines of the file will be meta-data that we don't care about. To get rid of it, write `drop 6` in front of the `csv:from-file user-file`. Hit **Run** again. The data should now be trimmed down to the part of the file that actually contains the run data. In this way, you can easily tweak how your data is to be imported and re-import it quickly.
 
 6. After hitting **Run**, an output box will have appeared and then another code editor below that. In the new code editor write:
-    create-turtles-from-data data task [
-      set-x get "one-column"
-      set-y get "another-column"
-    ]
 
-where you should replace `one-column` and `another-column` with actual column names from your data. Hit **Run**. A bunch of turtles (one for each row) should be created!
+        create-turtles-from-data data task [
+          set-x get "one-column"
+          set-y get "another-column"
+        ]
+
+    where you should replace `one-column` and `another-column` with actual column names from your data. Hit **Run**. A bunch of turtles (one for each row) should be created!
 
 7. Hit **Interact** in the view. When you mouse over turtles, you can now see their coordinates.
 
