@@ -2,19 +2,72 @@ globals [ cells default-height default-width button-width current-output ]
 
 to setup-notebook
   xw:clear-all
+  clear-all
   set default-height 100
   set default-width 500
   set button-width 50
   set cells []
   xw:create-tab "notebook" [ xw:set-title "Notebook" ]
-  append-cell
+  xw:create-button "save" [
+    xw:set-label "save"
+    xw:set-height 20
+    xw:set-width 75
+    xw:set-commands "save"
+  ]
+  xw:create-button "load" [
+    xw:set-commands "load"
+    xw:set-label "load"
+    xw:set-height 20
+    xw:set-width 75
+    xw:set-x 100
+  ]
+end
+
+to save
+  let save-file user-new-file
+  if is-string? save-file [
+    let inputs n-values (floor (length cells / 2)) [ item (2 * ?) cells ]
+    let outputs n-values (floor (length cells / 2)) [ item (2 * ? + 1) cells ]
+    let serialized-cells (map [
+      (list [ xw:text ] xw:of ?1 [ xw:text ] xw:of ?2)
+    ] inputs outputs)
+    if file-exists? save-file [ file-delete save-file ]
+    file-open save-file
+    file-write (list serialized-cells data)
+    file-close
+  ]
+end
+
+to load
+  let load-file user-file
+  if is-string? load-file and file-exists? load-file [
+    file-open load-file
+    let file-data file-read
+    file-close
+    xw:clear-all
+    clear-all
+    setup-notebook
+    foreach first file-data [
+      append-cell
+      xw:ask last but-last cells [
+        xw:set-text first ?
+      ]
+      xw:ask last cells [
+        xw:set-text last ?
+        resize-cell
+      ]
+    ]
+    redo-layout
+    set data last file-data
+    xw:select-tab "notebook"
+  ]
 end
 
 to append-cell
   let y-pos ifelse-value (not empty? cells) [
     [xw:y + xw:height] xw:of last cells
   ] [
-    0
+    [xw:y + xw:height + 20] xw:of "save"
   ]
   let id (length cells) / 2
   let key (word "input " id)

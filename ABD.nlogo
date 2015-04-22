@@ -1,4 +1,4 @@
-extensions [ csv table xw ]
+extensions [ xw table csv ]
 
 __includes [ "notebook.nls" ]
 
@@ -21,6 +21,7 @@ turtles-own [
 to setup
   ca
   setup-notebook
+  append-cell
   set-default-shape turtles "circle"
   xw:ask "input 0" [
     xw:set-text "set data csv:from-file user-file\necho-table take 20 data"
