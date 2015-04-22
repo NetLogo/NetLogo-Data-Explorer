@@ -47,7 +47,13 @@ to run-cell [ id ]
     xw:set-text ""
     resize-cell
   ]
-  run [ xw:text ] xw:of cell
+  xw:ask cell [
+    carefully [
+      run xw:text
+    ] [
+      user-message error-message
+    ]
+  ]
   if current-output = last cells [
     append-cell
   ]
