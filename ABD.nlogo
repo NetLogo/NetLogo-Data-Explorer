@@ -9,6 +9,12 @@ globals [
   min-y
   max-x
   max-y
+  
+  var1
+  var2
+  var3
+  var4
+  var5
 ]
 
 turtles-own [
@@ -24,7 +30,14 @@ to setup
   append-cell
   set-default-shape turtles "circle"
   xw:ask "input 0" [
-    xw:set-text "set data csv:from-file user-file\necho-table take 20 data"
+    xw:set-text (word
+      "; To get rid of headers of files, use `drop`. For instance,\n"
+      "; set data drop 6 csv:from-file user-file\n"
+      "; will get rid of the headers of BehaviorSpace files\n"
+      "set data csv:from-file user-file\n"
+      "print-value (word \"Number of rows: \" (length data - 1))\n"
+      "print-table take 15 data"
+    )
   ]
 end
 
@@ -147,12 +160,12 @@ to create-turtles-from-data [ table command ]
   ]
 end
 
-to print-table [ table ]
+to cc-print-table [ table ]
   format-table table task print
 end
 
-to echo-table [ table ]
-  format-table table task echo
+to print-table [ table ]
+  format-table table task print-value
 end
 
 to format-table [ table output-task ]

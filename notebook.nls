@@ -112,7 +112,7 @@ to run-cell [ id ]
   ]
 end
 
-to echo [ val ]
+to print-value [ val ]
   xw:ask current-output [
     ifelse empty? xw:text [
       xw:set-text (word val)
