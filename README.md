@@ -3,7 +3,7 @@ Warning! Never run `clear-all`! Use `clear-turtles`, `clear-patches`, and so for
 Getting started
 ---
 
-1. Click **setup** and then **go**. There should now be a **Notebook** tab.
+1. Open up `NetLogo Notebook.nlogo`. Click **setup** and then **go**. There should now be a **Notebook** tab.
 2. Hit **3D** on the NetLogo view to pop out a 3D view in a seperate window.
 3. Switch to the **Notebook** tab. You should see a code editor that says:
 
