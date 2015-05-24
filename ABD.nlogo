@@ -1,4 +1,4 @@
-extensions [ xw table csv ]
+extensions [ xw table csv palette ]
 
 __includes [ "notebook.nls" ]
 
@@ -148,16 +148,23 @@ end
 ;; Data primitives
 ;;;
 
-to create-turtles-from-data [ table command ]
+to create-turtles-from-data [ table cmd ]
   let column-names first table
   foreach but-first table [
     crt 1 [
       set shape "circle"
       set my-data ?
       set keys column-names
-      run command
+      run cmd
     ]
   ]
+end
+
+to ask-sorted-turtles [ ts key cmd ]
+  let sorted-ts sort-on [ runresult key ] ts
+  (foreach sorted-ts (fput nobody but-last sorted-ts) (lput nobody but-first sorted-ts) [
+    ask ?1 [(run cmd ?2 ?3)]
+  ])
 end
 
 to cc-print-table [ table ]

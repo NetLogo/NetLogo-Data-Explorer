@@ -7,10 +7,14 @@ Getting started
 2. Hit **3D** on the NetLogo view to pop out a 3D view in a seperate window.
 3. Switch to the **Notebook** tab. You should see a code editor that says:
 
+        ; To get rid of headers of files, use `drop`. For instance,
+        ; set data drop 6 csv:from-file user-file
+        ; will get rid of the headers of BehaviorSpace files
         set data csv:from-file user-file
-        echo-table take 20 data
+        print-value (word "Number of rows: " (length data - 1))
+        print-table take 15 data
 
-    and a **Run** button. `user-file` is a built-in NetLogo primitive that opens up a open-file dialog and reports whatever the user chooses. `csv:from-file` reads in a CSV file as a list of lists, where each list is a row. `take 20 <list>` simply reports the first 20 items of a list. `echo-table` prints out a list of lists in tabular format in an output window that will be created when you hit **Run**. So, this code reads in a CSV file, stores it in the `data` variable, and then prints out the first 20 rows of it a nicely formatted way.
+    and a **Run** button. `user-file` is a built-in NetLogo primitive that opens up a open-file dialog and reports whatever the user chooses. `csv:from-file` reads in a CSV file as a list of lists, where each list is a row. `take 20 <list>` simply reports the first 20 items of a list. `print-table` prints out a list of lists in tabular format in an output window that will be created when you hit **Run**. So, this code reads in a CSV file, stores it in the `data` variable, and then prints out the first 20 rows of it a nicely formatted way.
 
 4. Go ahead and hit **Run**. Select a CSV file and hit **Open**. The first 20 lines of the CSV file should be printed, with rows numbered and columns lined up together.
 
@@ -33,11 +37,11 @@ Primitives
 
 ### Notebook
 
-#### `echo <anything>`
+#### `print-value <anything>`
 
 Prints out its argument in the output window below the current editor.
 
-#### `echo-table <list-of-lists>`
+#### `print-table <list-of-lists>`
 
 Prints out the given tabular data in the output window, with rows numbered and columns lined up.
 

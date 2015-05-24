@@ -3,7 +3,7 @@ globals [ cells default-height default-width button-width current-output ]
 to setup-notebook
   xw:clear-all
   clear-all
-  set default-height 100
+  set default-height 110
   set default-width 500
   set button-width 50
   set cells []
