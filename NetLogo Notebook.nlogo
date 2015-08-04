@@ -48,9 +48,11 @@ to go
     ask turtles [
       let target-view-x x-to-xcor xc
       let target-view-y y-to-ycor yc
+      let old-heading heading
       facexy target-view-x target-view-y
       let dist distancexy target-view-x target-view-y
       fd dist / 5
+      set heading old-heading
       if dist > max-dist [ set max-dist dist ]
     ]
     ;show max-dist
